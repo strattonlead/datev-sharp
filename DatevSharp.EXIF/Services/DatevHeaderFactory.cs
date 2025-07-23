@@ -85,7 +85,7 @@ namespace CreateIf.Datev.Services
                 Beraternummer = beraterNr,
                 Mandantennummer = mandantNr,
                 Wirtschaftsjahresbeginn = DateTime.Today.ToString("yyyyMMdd"),
-                ErzeugtAm = DateTime.Now.ToString("yyyyMMddHHmmssfff"),
+                ErzeugtAm = DateTime.Now,
                 Bezeichnung = $"\"{(string.IsNullOrWhiteSpace(bezeichnung) ? def.Formatname.Trim('"') : bezeichnung)}\""
             };
         }

@@ -24,7 +24,8 @@ namespace CreateIf.Datev.Models
         public int Formatversion { get; set; } = 13;
 
         [Index(5)]
-        public string ErzeugtAm { get; set; } = DateTime.Now.ToString("yyyyMMddHHmmssfff");
+        [Format("yyyyMMddHHmmssfff")]
+        public DateTime ErzeugtAm { get; set; } = DateTime.Now;
 
         [Index(6)]
         public string Importiert { get; set; } = "";

@@ -16,7 +16,8 @@ namespace DatevSharp.EXIF.Services
 
         public CsvExportService()
         {
-            _config = new CsvConfiguration(new CultureInfo("de-DE"))
+            //_config = new CsvConfiguration(new CultureInfo("de-DE"))
+            _config = new CsvConfiguration(CultureInfo.InvariantCulture)
             {
                 Delimiter = ";",
                 Encoding = Encoding.GetEncoding("ISO-8859-1"),
@@ -38,6 +39,7 @@ namespace DatevSharp.EXIF.Services
         {
             using var writer = new StreamWriter(outputStream, _config.Encoding, 1024, true);
             using var csv = new CsvWriter(writer, _config);
+            csv.Context.RegisterClassMap<DatevHeaderCsvMap>();
 
             // 1. Header schreiben (erste Zeile)
             var headerProps = typeof(DatevHeader).GetProperties();

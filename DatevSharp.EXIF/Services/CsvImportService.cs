@@ -2,6 +2,7 @@
 using CsvHelper;
 using CsvHelper.Configuration;
 using DatevSharp.EXIF.Models;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -90,7 +91,7 @@ namespace CreateIf.Datev.Services
                 Formatkategorie = int.Parse(values[2]),
                 Formatname = values[3],
                 Formatversion = int.Parse(values[4]),
-                ErzeugtAm = values[5],
+                ErzeugtAm = DateTime.ParseExact(values[5], "yyyyMMddHHmmssfff", CultureInfo.InvariantCulture),
                 Herkunft = values[7],
                 ExportiertVon = values[8],
                 ImportiertVon = values[9],

@@ -23,7 +23,7 @@ namespace DatevSharp.EXIF.Services
                 Formatkategorie = (int)def.Kategorie,
                 Formatname = def.Formatname,
                 Formatversion = def.Formatversion,
-                ErzeugtAm = now.ToString("yyyyMMddHHmmssfff"),
+                ErzeugtAm = now,
                 Herkunft = "\"RE\"",
                 ExportiertVon = "\"CreateIf\"",
                 ImportiertVon = "\"\"",
