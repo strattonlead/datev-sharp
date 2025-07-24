@@ -42,11 +42,12 @@ namespace DatevSharp.EXIF.Services
             csv.Context.RegisterClassMap<DatevHeaderCsvMap>();
 
             // 1. Header schreiben (erste Zeile)
-            var headerProps = typeof(DatevHeader).GetProperties();
-            foreach (var prop in headerProps)
-            {
-                csv.WriteField(prop.GetValue(header));
-            }
+            csv.WriteRecord(header);
+            //var headerProps = typeof(DatevHeader).GetProperties();
+            //foreach (var prop in headerProps)
+            //{
+            //    csv.WriteField(prop.GetValue(header));
+            //}
             csv.NextRecord();
 
             // 2. Überschriftenzeile (Spaltennamen – optional, aber nützlich)
@@ -58,15 +59,7 @@ namespace DatevSharp.EXIF.Services
             csv.NextRecord();
 
             // 3. Buchungsdaten
-            foreach (var buchung in buchungen)
-            {
-                foreach (var prop in properties)
-                {
-                    var value = prop.GetValue(buchung);
-                    csv.WriteField(value);
-                }
-                csv.NextRecord();
-            }
+            csv.WriteRecords(buchungen);
 
             writer.Flush();
         }

@@ -92,6 +92,7 @@ namespace CreateIf.Datev.Services
                 Formatname = values[3],
                 Formatversion = int.Parse(values[4]),
                 ErzeugtAm = DateTime.ParseExact(values[5], "yyyyMMddHHmmssfff", CultureInfo.InvariantCulture),
+                Importiert = values[6],
                 Herkunft = values[7],
                 ExportiertVon = values[8],
                 ImportiertVon = values[9],

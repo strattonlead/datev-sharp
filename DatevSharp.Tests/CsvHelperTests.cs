@@ -1,5 +1,6 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
+using CsvHelper.Configuration.Attributes;
 using CsvHelper.TypeConversion;
 using System;
 using System.Globalization;
@@ -17,7 +18,9 @@ namespace DatevSharp.Tests
             // Arrange
             var records = new[]
                 {
-                new SampleRecord { Timestamp = new DateTime(2025, 07, 23, 14, 35, 59, 123) }
+                new SampleRecord {
+                    Text = "String Values",
+                    Timestamp = new DateTime(2025, 07, 23, 14, 35, 59, 123) }
             };
 
             //_config = new CsvConfiguration(new CultureInfo("de-DE"))
@@ -39,6 +42,9 @@ namespace DatevSharp.Tests
 
             // Assert: CSV enthält korrekt formatiertes Datum
             Assert.Contains("20250723143559123", csvOutput);
+            Assert.DoesNotContain("\"20250723143559123\"", csvOutput);
+
+            Assert.Contains("\"String Values\"", csvOutput);
 
             // Act: Jetzt wieder einlesen
             SampleRecord readRecord;
@@ -82,6 +88,8 @@ namespace DatevSharp.Tests
 
     public class SampleRecord
     {
+        [Index(0)]
+        public string Text { get; set; }
         public DateTime Timestamp { get; set; }
     }
 
@@ -89,8 +97,11 @@ namespace DatevSharp.Tests
     {
         public SampleRecordMap()
         {
+            Map(m => m.Text)
+               .Index(0);
+
             Map(m => m.Timestamp)
-                .Index(0)
+                .Index(1)
                 .TypeConverter(new DateTimeCustomConverter("yyyyMMddHHmmssfff"));
         }
     }
