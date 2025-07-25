@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DatevSharp.CSV.Helper\DatevSharp.CSV.Helper.csproj" />
     <ProjectReference Include="..\DatevSharp.EXIF\DatevSharp.EXIF.csproj" />
   </ItemGroup>
 

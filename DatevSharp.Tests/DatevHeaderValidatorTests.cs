@@ -34,7 +34,7 @@ namespace DatevSharp.Tests
                 Formatversion = 1,
                 Beraternummer = 0,
                 Mandantennummer = 0,
-                Wirtschaftsjahresbeginn = "2025-01-01"
+                Wirtschaftsjahresbeginn = new System.DateTime(2025, 1, 1)
             };
 
             var validator = new DatevHeaderValidator();

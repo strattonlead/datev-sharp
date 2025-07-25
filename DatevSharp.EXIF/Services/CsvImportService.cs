@@ -1,114 +1,59 @@
 ﻿using CreateIf.Datev.Models;
-using CsvHelper;
-using CsvHelper.Configuration;
+using DatevSharp.CSV.Helper;
 using DatevSharp.EXIF.Models;
-using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace CreateIf.Datev.Services
 {
     public class CsvImportService
     {
-        private readonly CsvConfiguration _config;
+        private Encoding _encoding => Encoding.GetEncoding("ISO-8859-1");
 
-        public CsvImportService()
-        {
-            _config = new CsvConfiguration(new CultureInfo("de-DE"))
-            {
-                Delimiter = ";",
-                Encoding = Encoding.GetEncoding("ISO-8859-1"),
-                HasHeaderRecord = false,
-                NewLine = "\r\n",
-                BadDataFound = null,
-                MissingFieldFound = null
-            };
-        }
-
+        /// <summary>
+        /// Liest einen DATEV-Buchungsstapel (Header + Buchungen).
+        /// </summary>
         public (DatevHeader Header, List<Buchung> Buchungen) ImportBuchungsstapel(Stream input)
         {
-            using var reader = new StreamReader(input, _config.Encoding, true);
-            using var csv = new CsvReader(reader, _config);
+            using var reader = new StreamReader(input, _encoding, true);
+            using var csv = new DatevCsvReader(reader);
 
-            if (!csv.Read())
+            // Header lesen (erste Zeile) & cachen
+            var header = csv.GetHeader<DatevHeader>();
+            if (header == null)
                 throw new InvalidDataException("Die CSV-Datei enthält keine Headerzeile.");
 
-            var headerValues = csv.Context.Parser.Record;
-            if (headerValues is null || headerValues.Length < 22)
-                throw new InvalidDataException("Ungültiger DATEV-Header oder Datei leer.");
-
-            var header = ParseHeader(headerValues);
-
-            if (!csv.Read())
+            // Spaltenüberschriften (zweite Zeile) überspringen
+            if (csv.ReadLine() == null)
                 throw new InvalidDataException("Die CSV-Datei enthält keine Überschriftszeile.");
 
-            // Spaltenüberschrift (zweite Zeile) ignorieren
-            var buchungen = new List<Buchung>();
-
-            while (csv.Read())
-            {
-                var buchung = csv.GetRecord<Buchung>();
-                buchungen.Add(buchung);
-            }
+            // Alle weiteren Zeilen als Buchung einlesen
+            var buchungen = csv.ReadRecords<Buchung>().ToList();
 
             return (header, buchungen);
         }
 
+        /// <summary>
+        /// Liest Debitoren/Kreditoren-Stammdaten (Header + Records).
+        /// </summary>
         public List<DebitorKreditor> ImportDebitoren(Stream input)
         {
-            using var reader = new StreamReader(input, _config.Encoding, true);
-            using var csv = new CsvReader(reader, _config);
+            using var reader = new StreamReader(input, _encoding, true);
+            using var csv = new DatevCsvReader(reader);
 
-            var result = new List<DebitorKreditor>();
+            // Header (erste Zeile) überspringen & cachen
+            var header = csv.GetHeader<DatevHeader>();
+            if (header == null)
+                throw new InvalidDataException("DATEV Header fehlt.");
 
-            // Header (EXTF...) überspringen
-            if (!csv.Read()) throw new InvalidDataException("DATEV Header fehlt.");
-            // Spaltenüberschriften überspringen
-            if (!csv.Read()) throw new InvalidDataException("Überschrift fehlt.");
+            // Spaltenüberschriften (zweite Zeile) überspringen
+            if (csv.ReadLine() == null)
+                throw new InvalidDataException("Überschrift fehlt.");
 
-            while (csv.Read())
-            {
-                var record = csv.GetRecord<DebitorKreditor>();
-                result.Add(record);
-            }
-
-            return result;
-        }
-
-
-
-        private DatevHeader ParseHeader(string[] values)
-        {
-            if (values.Length < 22)
-                throw new InvalidDataException("Ungültiger DATEV-Header: zu wenige Felder.");
-
-            return new DatevHeader
-            {
-                Kennzeichen = values[0],
-                Versionsnummer = int.Parse(values[1]),
-                Formatkategorie = int.Parse(values[2]),
-                Formatname = values[3],
-                Formatversion = int.Parse(values[4]),
-                ErzeugtAm = DateTime.ParseExact(values[5], "yyyyMMddHHmmssfff", CultureInfo.InvariantCulture),
-                Importiert = values[6],
-                Herkunft = values[7],
-                ExportiertVon = values[8],
-                ImportiertVon = values[9],
-                Beraternummer = int.Parse(values[10]),
-                Mandantennummer = int.Parse(values[11]),
-                Wirtschaftsjahresbeginn = values[12],
-                Sachkontenlaenge = int.Parse(values[13]),
-                DatumVon = values[14],
-                DatumBis = values[15],
-                Bezeichnung = values[16],
-                Diktatkürzel = values[17],
-                Buchungstyp = int.Parse(values[18]),
-                Rechnungslegungszweck = int.Parse(values[19]),
-                Festschreibung = int.Parse(values[20]),
-                Waehrung = values[21]
-            };
+            // Alle weiteren Zeilen als Debitor/Kreditor einlesen
+            return csv.ReadRecords<DebitorKreditor>().ToList();
         }
     }
 }

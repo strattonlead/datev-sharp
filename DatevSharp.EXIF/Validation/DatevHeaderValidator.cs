@@ -3,7 +3,6 @@ using CreateIf.Datev.Services;
 using DatevSharp.EXIF.Models;
 using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 
 namespace CreateIf.Datev.Validation
 {
@@ -25,9 +24,6 @@ namespace CreateIf.Datev.Validation
 
             if (header.Mandantennummer <= 0)
                 errors.Add("Mandantennummer fehlt oder ist ungültig.");
-
-            if (!Regex.IsMatch(header.Wirtschaftsjahresbeginn ?? "", @"^\d{8}$"))
-                errors.Add("Wirtschaftsjahresbeginn muss im Format yyyyMMdd vorliegen.");
 
             // Lookup und Formatkategorie prüfen
             if (!Enum.IsDefined(typeof(Formatkategorie), header.Formatkategorie))

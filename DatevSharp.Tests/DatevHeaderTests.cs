@@ -13,7 +13,7 @@ namespace DatevSharp.Tests
                 Formatversion = 13,
                 Beraternummer = 1234,
                 Mandantennummer = 56789,
-                Wirtschaftsjahresbeginn = "20250101",
+                Wirtschaftsjahresbeginn = new System.DateTime(2025, 1, 1),
                 Sachkontenlaenge = 4
             };
 

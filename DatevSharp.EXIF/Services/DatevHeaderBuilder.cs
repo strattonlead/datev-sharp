@@ -29,7 +29,7 @@ namespace DatevSharp.EXIF.Services
                 ImportiertVon = "\"\"",
                 Beraternummer = beraternummer,
                 Mandantennummer = mandantennummer,
-                Wirtschaftsjahresbeginn = new DateTime(now.Year, 1, 1).ToString("yyyyMMdd"),
+                Wirtschaftsjahresbeginn = new DateTime(now.Year, 1, 1),
                 Sachkontenlaenge = def.Sachkontenlaenge ?? 0,
                 Bezeichnung = $"\"{(string.IsNullOrWhiteSpace(bezeichnung) ? def.Formatname.Trim('"') : bezeichnung)}\"",
                 Diktatkürzel = "\"WD\"",

@@ -84,7 +84,7 @@ namespace CreateIf.Datev.Services
                 Sachkontenlaenge = def.Sachkontenlaenge ?? 0,
                 Beraternummer = beraterNr,
                 Mandantennummer = mandantNr,
-                Wirtschaftsjahresbeginn = DateTime.Today.ToString("yyyyMMdd"),
+                Wirtschaftsjahresbeginn = DateTime.Today,
                 ErzeugtAm = DateTime.Now,
                 Bezeichnung = $"\"{(string.IsNullOrWhiteSpace(bezeichnung) ? def.Formatname.Trim('"') : bezeichnung)}\""
             };
