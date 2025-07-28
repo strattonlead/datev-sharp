@@ -11,13 +11,13 @@ namespace DatevSharp.EXIF.Services
     {
         private Encoding _encoding => Encoding.GetEncoding("ISO-8859-1");
 
-        public void ExportBuchungsstapel(Stream stream, Formatkategorie kategorie, int beraternummer, int mandantennummer, IEnumerable<Buchung> daten, string bezeichnung = null)
+        public void ExportBuchungsstapel(Stream stream, Formatkategorie kategorie, int beraternummer, int mandantennummer, IEnumerable<Buchungsstapel> daten, string bezeichnung = null)
         {
             var header = DatevHeaderBuilder.Create(kategorie, beraternummer, mandantennummer, bezeichnung);
             ExportBuchungsstapel(stream, header, daten);
         }
 
-        public void ExportBuchungsstapel(Stream outputStream, DatevHeader header, IEnumerable<Buchung> buchungen)
+        public void ExportBuchungsstapel(Stream outputStream, DatevHeader header, IEnumerable<Buchungsstapel> buchungen)
         {
             using var writer = new StreamWriter(outputStream, _encoding, 1024, true);
             using var csv = new DatevCsvWriter(writer);
@@ -26,12 +26,7 @@ namespace DatevSharp.EXIF.Services
             csv.WriteRecord(header);
 
             // 2. Überschriftenzeile (Spaltennamen – optional, aber nützlich)
-            //var properties = typeof(Buchung).GetProperties();
-            //foreach (var prop in properties)
-            //{
-            //    csv.WriteField(prop.Name);
-            //}
-            //csv.NextRecord();
+            writer.WriteLine(DatevCsvHeaders.BookingBatch);
 
             // 3. Buchungsdaten
             foreach (var buchung in buchungen)

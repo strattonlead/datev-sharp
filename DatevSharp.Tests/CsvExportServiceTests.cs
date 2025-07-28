@@ -21,11 +21,11 @@ namespace DatevSharp.Tests
                 Sachkontenlaenge = 4
             };
 
-            var buchung = new Buchung
+            var buchung = new Buchungsstapel
             {
                 Umsatz = 100.99m,
-                Konto = "8400",
-                Gegenkonto = "1200",
+                Konto = 8400,
+                Gegenkonto = 1200,
                 BUSchluessel = "\"1000\"",
                 Buchungstext = "\"Testbuchung\""
             };

@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Datev.DocumentTransfer\Datev.DocumentTransfer.csproj" />
     <ProjectReference Include="..\DatevSharp.CSV.Helper\DatevSharp.CSV.Helper.csproj" />
     <ProjectReference Include="..\DatevSharp.EXIF\DatevSharp.EXIF.csproj" />
   </ItemGroup>
@@ -26,6 +27,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Data\EXTF_Header.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Data\EXTF_Buchungsstapel.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CreateIf.Datev.Models;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -10,23 +11,27 @@ namespace DatevSharp.CSV.Helper
     {
         private readonly TextReader _reader;
         private readonly string _delimiter;
-        private object? _cachedHeader;
+        private DatevHeader _cachedHeader;
         private bool _headerRead = false;
+        public DatevHeader Header => GetHeader();
 
         public DatevCsvReader(TextReader reader, string delimiter = ";")
         {
             _reader = reader ?? throw new ArgumentNullException(nameof(reader));
             _delimiter = delimiter;
+            GetHeader();
         }
 
         /// <summary>
         /// Liest und cached die erste Zeile als DatevHeader.
         /// Kann beliebig oft abgerufen werden, ohne den Stream erneut zu lesen.
         /// </summary>
-        public T GetHeader<T>() where T : new()
+        public DatevHeader GetHeader()
         {
-            if (_headerRead && _cachedHeader is T typedHeader)
-                return typedHeader;
+            if (_headerRead && _cachedHeader != null)
+            {
+                return _cachedHeader;
+            }
 
             // Erste Zeile lesen und mappen
             var headerLine = _reader.ReadLine();
@@ -34,7 +39,7 @@ namespace DatevSharp.CSV.Helper
                 throw new InvalidOperationException("CSV enthält keine Header-Zeile.");
 
             var headerFields = SplitCsvLine(headerLine);
-            var header = MapToObject<T>(headerFields);
+            var header = MapToObject<DatevHeader>(headerFields, true);
 
             _cachedHeader = header;
             _headerRead = true;
@@ -45,7 +50,7 @@ namespace DatevSharp.CSV.Helper
         /// <summary>
         /// Liest eine Zeile und gibt sie als Liste von Strings/Null zurück.
         /// </summary>
-        public List<string?>? ReadLine()
+        public List<string> ReadLine()
         {
             var line = _reader.ReadLine();
             if (line == null)
@@ -61,7 +66,7 @@ namespace DatevSharp.CSV.Helper
         {
             var fields = ReadLine();
             if (fields == null) return default;
-            return MapToObject<T>(fields);
+            return MapToObject<T>(fields, false);
         }
 
         /// <summary>
@@ -69,16 +74,16 @@ namespace DatevSharp.CSV.Helper
         /// </summary>
         public IEnumerable<T> ReadRecords<T>() where T : new()
         {
-            List<string?>? line;
+            List<string> line;
             while ((line = ReadLine()) != null)
             {
                 if (line.Count == 0 || line.All(string.IsNullOrWhiteSpace))
                     continue;
-                yield return MapToObject<T>(line);
+                yield return MapToObject<T>(line, false);
             }
         }
 
-        private T MapToObject<T>(List<string?> fields) where T : new()
+        private T MapToObject<T>(List<string> fields, bool isHeader) where T : new()
         {
             var obj = new T();
 
@@ -109,16 +114,26 @@ namespace DatevSharp.CSV.Helper
 
                 if (targetType == typeof(string))
                 {
-                    if (val == string.Empty)
+                    if (isHeader)
                     {
-                        props[i].Property.SetValue(obj, null);
+                        if (val == string.Empty)
+                        {
+                            props[i].Property.SetValue(obj, null);
+                        }
+                        else
+                        {
+                            if (val.StartsWith("\"") && val.EndsWith("\""))
+                                val = val[1..^1];
+                            props[i].Property.SetValue(obj, val);
+                        }
                     }
                     else
                     {
-                        if (val.StartsWith("\"") && val.EndsWith("\""))
-                            val = val[1..^1];
-                        props[i].Property.SetValue(obj, val);
+                        // Daten: leere Strings und null als null behandeln
+                        props[i].Property.SetValue(obj, val == null ? string.Empty : val);
                     }
+
+
                 }
                 else if (targetType == typeof(DateTime))
                 {
@@ -129,11 +144,11 @@ namespace DatevSharp.CSV.Helper
                 }
                 else if (targetType == typeof(int))
                 {
-                    props[i].Property.SetValue(obj, string.IsNullOrEmpty(val) ? null : Convert.ToInt32(val, CultureInfo.InvariantCulture));
+                    props[i].Property.SetValue(obj, val.IsNullOrQuotes() ? null : Convert.ToInt32(val, CultureInfo.InvariantCulture));
                 }
                 else if (targetType == typeof(decimal))
                 {
-                    props[i].Property.SetValue(obj, string.IsNullOrEmpty(val) ? null : Convert.ToDecimal(val, CultureInfo.InvariantCulture));
+                    props[i].Property.SetValue(obj, val.IsNullOrQuotes() ? null : Convert.ToDecimal(val, CultureInfo.InvariantCulture));
                 }
             }
 
@@ -144,47 +159,15 @@ namespace DatevSharp.CSV.Helper
         /// Zerlegt eine CSV-Zeile und unterscheidet zwischen null (;) und "" (gequotet leer).
         /// </summary>
         private List<string> SplitCsvLine(string line) => line.Split(";").ToList();
-        //{
-        //    var result = new List<string?>();
-        //    bool inQuotes = false;
-        //    var current = "";
-
-        //    for (int i = 0; i < line.Length; i++)
-        //    {
-        //        var c = line[i];
-
-        //        if (c == '"')
-        //        {
-        //            inQuotes = !inQuotes;
-        //            continue;
-        //        }
-
-        //        if (c == _delimiter[0] && !inQuotes)
-        //        {
-        //            result.Add(ProcessField(current));
-        //            current = "";
-        //        }
-        //        else
-        //        {
-        //            current += c;
-        //        }
-        //    }
-        //    result.Add(ProcessField(current)); // letztes Feld
-        //    return result;
-        //}
-
-        private string? ProcessField(string raw)
-        {
-            if (raw == string.Empty)
-                return null;           // unquoted leer
-            if (raw == "\"\"")
-                return string.Empty;   // explizit gequoted leer
-            return raw;
-        }
 
         public void Dispose()
         {
             _reader?.Dispose();
         }
+    }
+
+    public static class StringHelper
+    {
+        public static bool IsNullOrQuotes(this string value) => value == null ? true : string.IsNullOrEmpty(value) || (value.Length == 2 && value.StartsWith("\"") && value.EndsWith("\""));
     }
 }

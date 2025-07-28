@@ -15,13 +15,13 @@ namespace CreateIf.Datev.Services
         /// <summary>
         /// Liest einen DATEV-Buchungsstapel (Header + Buchungen).
         /// </summary>
-        public (DatevHeader Header, List<Buchung> Buchungen) ImportBuchungsstapel(Stream input)
+        public (DatevHeader Header, List<Buchungsstapel> Buchungen) ImportBuchungsstapel(Stream input)
         {
             using var reader = new StreamReader(input, _encoding, true);
             using var csv = new DatevCsvReader(reader);
 
             // Header lesen (erste Zeile) & cachen
-            var header = csv.GetHeader<DatevHeader>();
+            var header = csv.GetHeader();
             if (header == null)
                 throw new InvalidDataException("Die CSV-Datei enthält keine Headerzeile.");
 
@@ -30,7 +30,7 @@ namespace CreateIf.Datev.Services
                 throw new InvalidDataException("Die CSV-Datei enthält keine Überschriftszeile.");
 
             // Alle weiteren Zeilen als Buchung einlesen
-            var buchungen = csv.ReadRecords<Buchung>().ToList();
+            var buchungen = csv.ReadRecords<Buchungsstapel>().ToList();
 
             return (header, buchungen);
         }
@@ -44,7 +44,7 @@ namespace CreateIf.Datev.Services
             using var csv = new DatevCsvReader(reader);
 
             // Header (erste Zeile) überspringen & cachen
-            var header = csv.GetHeader<DatevHeader>();
+            var header = csv.GetHeader();
             if (header == null)
                 throw new InvalidDataException("DATEV Header fehlt.");
 

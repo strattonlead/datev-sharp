@@ -22,8 +22,8 @@ namespace DatevSharp.Tests
             Assert.Equal("EXTF", header.Kennzeichen);
             Assert.Single(buchungen);
             Assert.Equal(100.99m, buchungen[0].Umsatz);
-            Assert.Equal("8400", buchungen[0].Konto);
-            Assert.Equal("1200", buchungen[0].Gegenkonto);
+            Assert.Equal(8400, buchungen[0].Konto);
+            Assert.Equal(1200, buchungen[0].Gegenkonto);
         }
 
         [Fact]

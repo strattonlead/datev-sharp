@@ -27,8 +27,21 @@ namespace DatevSharp.Tests
             var original = File.ReadAllText(TestFilePath, Encoding.GetEncoding("ISO-8859-1"));
             var generated = Encoding.GetEncoding("ISO-8859-1").GetString(memory.ToArray());
 
+            AssertEachLine(original, generated);
             Assert.Equal(NormalizeLineEndings(original), NormalizeLineEndings(generated));
         }
+
+        private static void AssertEachLine(string original, string generated)
+        {
+            var originalLines = NormalizeLineEndings(original).Split('\n');
+            var generatedLines = NormalizeLineEndings(generated).Split('\n');
+            Assert.Equal(originalLines.Length, generatedLines.Length);
+            for (int i = 0; i < originalLines.Length; i++)
+            {
+                Assert.Equal(originalLines[i], generatedLines[i]);
+            }
+        }
+
 
         private static string NormalizeLineEndings(string input) =>
             input.Replace("\r\n", "\n").Replace("\r", "\n").Trim();

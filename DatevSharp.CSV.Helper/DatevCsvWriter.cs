@@ -46,7 +46,7 @@ namespace DatevSharp.CSV.Helper
             WriteRecordValues(values);
         }
 
-        public void WriteRecordValues(IEnumerable<object?> values)
+        public void WriteRecordValues(IEnumerable<object> values)
         {
             bool first = true;
             foreach (var value in values)
@@ -90,7 +90,7 @@ namespace DatevSharp.CSV.Helper
                 else
                 {
                     // Andere Typen (Zahlen etc.) → unquoted
-                    _writer.Write(Convert.ToString(value, CultureInfo.InvariantCulture));
+                    _writer.Write(Convert.ToString(value, CultureInfo.GetCultureInfo("de-DE")));
                 }
             }
             _writer.WriteLine();

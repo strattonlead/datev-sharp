@@ -79,28 +79,29 @@ namespace CreateIf.Datev.Models
         public string Waehrung { get; set; } = "\"EUR\"";
 
         [DatevPosition(22)]
-        public string Reserviert22 { get; set; } = "";
+        public string Reserviert1 { get; set; } = "";
 
         [DatevPosition(23)]
         public string Derivatskennzeichen { get; set; } = "\"\"";
 
         [DatevPosition(24)]
-        public string Reserviert24 { get; set; } = "";
+        public string Reserviert2 { get; set; } = "";
 
         [DatevPosition(25)]
-        public string Reserviert25 { get; set; } = "";
+        public string Reserviert3 { get; set; } = "";
+
 
         [DatevPosition(26)]
-        public string Reserviert26 { get; set; } = "";
-
-        [DatevPosition(27)]
         public string Sachkontenrahmen { get; set; } = "\"03\""; // z. B. 03 = SKR03
 
-        [DatevPosition(28)]
+        [DatevPosition(27)]
         public string BranchenloesungId { get; set; } = ""; // optional 4-stellig
 
+        [DatevPosition(28)]
+        public string Reserviert4 { get; set; }
+
         [DatevPosition(29)]
-        public string Reserviert29 { get; set; } = "";
+        public string Reserviert5 { get; set; } = "";
 
         [DatevPosition(30)]
         public string Anwendungsinformation { get; set; } = "\"\""; // max. 16 Zeichen
